@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace KekTura_struct;
+﻿namespace KekTura_struct;
 public struct Section
 {
     public string kiindulopont;
@@ -9,6 +7,19 @@ public struct Section
     public int emelkedes;
     public int lejtes;
     public char pecsetelohely;
+
+    // A gyári konstruktor 0 illetve "", '' kezdő értékekkel látta el a mezőket. A konstruktor neve mindig a típus nevével azonos!
+    // A gyári konstruktort itt felülírtuk:
+    public Section(string line)
+    {
+        string[] tempLine = line.Trim().Split(";");
+        this.kiindulopont = tempLine[0];
+        this.vegpont = tempLine[1];
+        this.hossz = Convert.ToDouble(tempLine[2]);
+        this.emelkedes = Convert.ToInt32(tempLine[3]);
+        this.lejtes = Convert.ToInt32(tempLine[4]);
+        this.pecsetelohely = Convert.ToChar(tempLine[5]);
+    }
 
     // Ez itt már egy metódus (olyan függvény, amelyet a struktúrában benn készítek el.)
     // A metódus a struct-nak egy képessége. Analógia: otthon, ahol benn főzök, mosok, takarítok...
@@ -26,33 +37,11 @@ class Program
 {
     static void Main(string[] args)
     {
-        /*
-        // Ez itt egy "külső" függvény volt, amit behelyztünk a struktúrába.
-        
-        bool IsIncompleteName(Section row) {
-            return !row.vegpont.Contains("pecsetelohely") && row.pecsetelohely == 'i';
-        
-        }
-        */
-
-        /* 
-        int StatusCalculate(int x, int y)
-        {
-            return x - y;
-        } 
-        */
-
         List<Section> textDatas = new List<Section>();
         string[] textFile = File.ReadAllLines("./kektura.csv");
         for (int i = 1; i < textFile.Length; i++)
         {
-            Section line = new Section();
-            line.kiindulopont = textFile[i].Trim().Split(";")[0];
-            line.vegpont = textFile[i].Trim().Split(";")[1];
-            line.hossz = Convert.ToDouble(textFile[i].Trim().Split(";")[2]);
-            line.emelkedes = Convert.ToInt32(textFile[i].Trim().Split(";")[3]);
-            line.lejtes = Convert.ToInt32(textFile[i].Trim().Split(";")[4]);
-            line.pecsetelohely = Convert.ToChar(textFile[i].Trim().Split(";")[5]);
+            Section line = new Section(textFile[i]);
             textDatas.Add(line);
         }
 
@@ -91,8 +80,6 @@ class Program
         int maximumHeight = 0;
         foreach (Section row in textDatas)
         {
-            // int status = row.emelkedes - row.lejtes;
-            //int status = StatusCalculate(row.emelkedes, row.lejtes);
             int status = row.StatusCalculate();
             currentHeight += status;
             if (currentHeight > maximumHeight)
